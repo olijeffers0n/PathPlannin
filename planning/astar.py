@@ -30,20 +30,18 @@ class AStarPlanner:
         self.closed.append(self.start_node)
         
         while len(self.open) != 0:
-
-            print(self.open)
             
             node = self.open[0][1]
+            self.open.pop(0)
 
             if node.__eq__(self.end_node):
                 return self.retracePath(node)
 
             for neighbour in self.getNeighbours(node):
                 if not self.closed.__contains__(neighbour):
-                    heapq.heappush(self.open, (self.getCost(neighbour), neighbour))
-                    self.closed.append(neighbour)
-
-            
+                    if (self.map.nodeIsWalkable(neighbour)):
+                        heapq.heappush(self.open, (self.getCost(neighbour), neighbour))
+                        self.closed.append(neighbour)
 
 
     def getNeighbours(self, node : Node) -> List[Node]:
@@ -61,10 +59,12 @@ class AStarPlanner:
         path = Path()
         currentNode = node
 
-        while not currentNode.__eq__(self.start_node):
-            path.add(currentNode)
-            if currentNode.parent == None: 
+        while True:
+            if currentNode == None: 
                 break
+            path.add(currentNode)
             currentNode = currentNode.parent
+
+        path.path = list(reversed(path.path))
 
         return path

@@ -31,5 +31,9 @@ class Map:
 
         return ("(%s,%s)" % (node.x, node.y))
 
+    def nodeIsWalkable(self, node : Node) -> bool:
+
+        return node.x >= 0 and node.x <= self.width and node.y >= 0 and node.y <= self.height
+
 
     
