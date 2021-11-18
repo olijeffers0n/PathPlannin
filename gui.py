@@ -1,6 +1,6 @@
 import dearpygui.dearpygui as dpg
 from planning import *
-import time, datetime
+import time 
 
 class MapNode:
 
@@ -27,7 +27,11 @@ class GUI:
             0 : [255,0,0],
             1 : [0,255,0],
             2 : [0,0,255],
-            3 : [0,0,0]
+            3 : [125,125,0],
+            4 : [0,125,125],
+            5 : [125,0,125],
+            "WALL" : [0,0,0],
+            "AIR" : [204, 185, 116]
         }
 
         with dpg.window(label="PathFinder Window", width=dpg.get_viewport_max_width(), height=dpg.get_viewport_max_height()) as window:
@@ -42,6 +46,8 @@ class GUI:
 
         start_time = time.time()
 
+        highlighted = []
+
         # below replaces, start_dearpygui()
         while dpg.is_dearpygui_running():
             # insert here any code you would like to run in the render loop
@@ -50,13 +56,17 @@ class GUI:
             if not (abs(time.time() - start_time) <= 3):
 
                 time_now = time.time()
-                if abs(time_now - self.time) >= 0.2:
+                if abs(time_now - self.time) >= 0.5:
                     self.time = time_now
+
+                    for node in highlighted:
+                        self.highlight(node, "AIR")
 
                     for i, path in enumerate(self.paths):
                         if len(path) != 0:
                             first = path.pop(0)
                             self.highlight((first.x, first.y), i)
+                            highlighted.append((first.x, first.y))
 
 
             dpg.render_dearpygui_frame()
@@ -70,9 +80,6 @@ class GUI:
         self.window_size = 600
 
         self.cell_size = (self.window_size // 20) - 4
-        colors = {
-            "AIR" : [204, 185, 116]
-        }
 
         self.node_grid = {}
 
@@ -81,7 +88,7 @@ class GUI:
         span = 0
         for row in grid:
             for node in row:
-                nodeident = dpg.draw_rectangle([min_x+node.x*self.cell_size, min_y+node.y*self.cell_size], [min_x+(node.x+1)*self.cell_size, (node.y+1)*self.cell_size], color=colors[node.state], fill=colors[node.state], parent=drawlist)
+                nodeident = dpg.draw_rectangle([min_x+node.x*self.cell_size, min_y+node.y*self.cell_size], [min_x+(node.x+1)*self.cell_size, (node.y+1)*self.cell_size], color=self.colours[node.state], fill=self.colours[node.state], parent=drawlist)
                 self.node_grid[(node.x, node.y)] = nodeident
             span += self.cell_size
 
@@ -124,11 +131,11 @@ class GUI:
 
         worldmap = Map(20, 20)
 
-        for i in range(13):
+        for i in range(17):
             worldmap.setNodeBlocked(Node(i,i, None))
 
         for key in worldmap.nodes.keys():
-            self.highlight(key, 3)
+            self.highlight(key, "WALL")
 
         manager = PathManager(worldmap)
 
@@ -141,6 +148,12 @@ class GUI:
         paths.append(self.getPath(manager, Node(0,5,None), Node(20,20,None), 0))
         ## Getting path 3
         paths.append(self.getPath(manager, Node(0,5,None), Node(2,0,None), 0))
+        ## Getting path 4
+        paths.append(self.getPath(manager, Node(17,2,None), Node(3,18,None), 0))
+        ## Getting path 5
+        paths.append(self.getPath(manager, Node(10,12,None), Node(19,10,None), 0))
+        ## Getting path 6
+        paths.append(self.getPath(manager, Node(3,5,None), Node(19,5,None), 0))
 
         return paths
 
