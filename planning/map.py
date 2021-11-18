@@ -12,24 +12,20 @@ class Map:
     def isNodeBlocked(self, node : Node) -> bool:
 
         try:
-            return self.nodes[self.__getMapKey(node)] != None
+            return self.nodes[(node.x,node.y)] != None
         except:
             return False
 
     def isNodeBlocked(self, x, y) -> bool:
 
         try:
-            return self.nodes[self.__getMapKey(Node(x, y, None))] != None
+            return self.nodes[(x,y)] != None
         except:
             return False
 
     def setNodeBlocked(self, node : Node) -> None:
 
-        self.nodes[self.__getMapKey(node)] = True
-
-    def __getMapKey(self, node : Node):
-
-        return ("(%s,%s)" % (node.x, node.y))
+        self.nodes[(node.x,node.y)] = True
 
     def nodeIsWalkable(self, node : Node) -> bool:
 
